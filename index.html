@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sorry na po, mahal</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: black;
+            color: white;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #warning-box {
+            display: none;
+            background-color: white;
+            color: black;
+            border: 1px solid gray;
+            padding: 15px;
+            width: 320px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .warning-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: bold;
+            background-color: #0078D7;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px 3px 0 0;
+        }
+        .warning-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .warning-header button:hover {
+            color: red;
+        }
+        #warning-content {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+        }
+        #warning-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        #lyrics {
+            flex: 1;
+            text-align: left;
+        }
+        .btn-container {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px;
+            border-top: 1px solid lightgray;
+        }
+        .btn-container button {
+            padding: 5px 15px;
+            margin-left: 5px;
+            background-color: lightgray;
+            border: 1px solid gray;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 3px;
+        }
+        .btn-container button:hover {
+            background-color: gray;
+            color: white;
+        }
+        .btn-container button:disabled {
+            background-color: #ddd;
+            color: #888;
+            cursor: not-allowed;
+        }
+        /* Pixelated Cat */
+        #cat-container {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .cat {
+            position: relative;
+            width: 150px;
+            height: 120px;
+            background: white;
+            border-radius: 70px;
+        }
+        .ear {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: white;
+            top: -20px;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        }
+        .ear.left { left: 10px; }
+        .ear.right { right: 10px; }
+        .eye {
+            position: absolute;
+            width: 18px;
+            height: 24px;
+            background: black;
+            top: 40px;
+            border-radius: 50%;
+        }
+        .eye.left { left: 40px; }
+        .eye.right { right: 40px; }
+        .pupil {
+            position: absolute;
+            width: 8px;
+            height: 12px;
+            background: white;
+            top: 5px;
+            left: 5px;
+            border-radius: 50%;
+        }
+        .nose {
+            position: absolute;
+            width: 12px;
+            height: 10px;
+            background: pink;
+            top: 65px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+        }
+        .mouth {
+            position: absolute;
+            width: 20px;
+            height: 10px;
+            background: black;
+            top: 75px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 0 0 10px 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="song" src="Joji_-_Sanctuary___Lyrics(128k).mp3" preload="auto"></audio>
+    <audio id="cat-sound" src="Cat_Meowing_-_Sound_Effect_-_Download(256k).mp3" preload="auto"></audio>
+
+    <div id="warning-box">
+        <div class="warning-header">
+            Warning
+            <div>
+                <button onclick="minimizeWarning()">-</button>
+                <button onclick="closeWarning()">X</button>
+            </div>
+        </div>
+        <div id="warning-content">
+            <img id="warning-icon" src="pause.jpg" alt="Play" onclick="toggleLyricsAudio()">
+            <p id="lyrics"></p>
+        </div>
+        <div class="btn-container">
+            <button id="back-btn" onclick="prevLyric()" disabled>◀</button>
+            <button id="next-btn" onclick="nextLyric()">OK</button>
+        </div>
+    </div>
+
+    <div id="cat-container">
+        <div class="cat">
+            <div class="ear left"></div>
+            <div class="ear right"></div>
+            <div class="eye left"><div class="pupil"></div></div>
+            <div class="eye right"><div class="pupil"></div></div>
+            <div class="nose"></div>
+            <div class="mouth"></div>
+        </div>
+        <p class="cat-text">Tap the cat to play/stop sound</p>
+        <p class="cat-text">Double tap the cat to bring back lyrics</p>
+    </div>
+
+    <script>
+        const lyrics = [
+            "Go ahead and bark after dark, fallen star",
+            "I'm your one call away",
+            "Motel halls, neon walls",
+            "When night falls, I am your escape",
+            "When you lay alone, I ache",
+            "Something I wanted to feel",
+            "If you've been waiting for fallin' in love",
+            "Babe, you don't have to wait on me",
+            "'Cause I've been aiming for heaven above",
+            "But an angel ain't what I need",
+            "Not anyone, you're the one",
+"More than fun, you're the sanctuary",
+"Cause what you want is what I want",
+"Sincerity",
+"I'm really sorry, mahal.",
+" I didn't expect to be this busy since yesterday, and when I said I'd make it up to you today, I truly meant it.",
+"I just didn't realize things would get hectic again.",
+"But please know that even when I'm busy, I love you so much.",
+"I hope you understand. Thank you so much, mahal. I miss you po."];
+
+        let index = 0;
+        const warningBox = document.getElementById("warning-box");
+        const lyricsText = document.getElementById("lyrics");
+        const song = document.getElementById("song");
+        const warningIcon = document.getElementById("warning-icon");
+        const catContainer = document.getElementById("cat-container");
+        const catSound = document.getElementById("cat-sound");
+        const backBtn = document.getElementById("back-btn");
+        const nextBtn = document.getElementById("next-btn");
+
+        function showWarning() {
+            warningBox.style.display = "block";
+            lyricsText.innerText = lyrics[index];
+            updateButtons();
+            playSong();
+        }
+
+        function playSong() {
+            song.play();
+        }
+
+        function toggleLyricsAudio() {
+            if (song.paused) {
+                song.play();
+                warningIcon.src = "play.jpg"; 
+            } else {
+                song.pause();
+                warningIcon.src = "pause.jpg"; 
+            }
+        }
+
+        function nextLyric() {
+            if (index < lyrics.length - 1) {
+                index++;
+                lyricsText.innerText = lyrics[index];
+                updateButtons();
+            }
+        }
+
+        function prevLyric() {
+            if (index > 0) {
+                index--;
+                lyricsText.innerText = lyrics[index];
+                updateButtons();
+            }
+        }
+
+        function updateButtons() {
+            backBtn.disabled = index === 0;
+            nextBtn.disabled = index === lyrics.length - 1;
+        }
+
+        function closeWarning() {
+            warningBox.style.display = "none";
+            song.pause();
+            catContainer.style.display = "block";
+            catSound.play();
+        }
+
+        catContainer.addEventListener("click", () => {
+            catSound.paused ? catSound.play() : catSound.pause();
+        });
+
+        catContainer.addEventListener("dblclick", () => {
+            catContainer.style.display = "none";
+            showWarning();
+            catSound.pause();
+        });
+
+        window.onload = showWarning;
+    </script>
+
+</body>
+</html>
